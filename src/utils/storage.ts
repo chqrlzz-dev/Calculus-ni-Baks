@@ -6,6 +6,7 @@ export interface CourseData {
   id: string;
   name: string;
   templateId?: string;
+  passingGrade: number; // Persisted passing threshold
   midtermComponents: GradingComponent[];
   finalsComponents: GradingComponent[];
   settings: {
@@ -14,7 +15,6 @@ export interface CourseData {
     targetGrade: number;
   };
   lastModified: string;
-  // Legacy fields (for backward compatibility during transition if needed)
   midtermState?: any;
   finalsState?: any;
 }
@@ -138,6 +138,7 @@ export const createDefaultCourse = (name: string = 'General Calculus'): CourseDa
     id: crypto.randomUUID(),
     name,
     templateId: template.id,
+    passingGrade: template.passingGrade,
     midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
     finalsComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
     settings: {
@@ -155,6 +156,7 @@ export const createCourseFromTemplate = (name: string, templateId: string): Cour
     id: crypto.randomUUID(),
     name,
     templateId: template.id,
+    passingGrade: template.passingGrade,
     midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
     finalsComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
     settings: {

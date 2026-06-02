@@ -24,11 +24,13 @@ const CalculationPreview: React.FC<CalculationPreviewProps> = ({
   activeCourse,
   grades,
 }) => {
+  const passingGrade = activeCourse.passingGrade || 75;
+
   // Helper function to get color based on grade
   const getGradeColor = (grade: number): string => {
-    if (grade >= 75) return "text-green-600 dark:text-green-400";
-    if (grade >= 60) return "text-yellow-600 dark:text-yellow-400";
-    if (grade >= 50) return "text-orange-600 dark:text-orange-400";
+    if (grade >= passingGrade) return "text-green-600 dark:text-green-400";
+    if (grade >= passingGrade - 15) return "text-yellow-600 dark:text-yellow-400";
+    if (grade >= passingGrade - 25) return "text-orange-600 dark:text-orange-400";
     return "text-red-600 dark:text-red-400";
   };
 

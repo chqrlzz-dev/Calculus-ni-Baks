@@ -1,15 +1,15 @@
 
 
-export type GradingFormulaType = 'sir-baks' | 'linear' | 'base-50' | 'base-60' | 'custom';
+export type GradingFormulaType = 'sir-baks' | 'linear' | 'base-50' | 'base-60' | 'zero-based';
 
 export interface GradingComponent {
   id: string;
   name: string;
-  weight: number; // Percentage (e.g., 0.35 for 35%)
+  weight: number; 
   score: number | null;
   maxScore: number | null;
   formulaType: GradingFormulaType;
-  isAverage?: boolean; // If true, it might contain sub-scores
+  isAverage?: boolean;
   subScores?: (number | null)[];
   subMaxScores?: (number | null)[];
 }
@@ -18,6 +18,7 @@ export interface GradingTemplate {
   id: string;
   name: string;
   description: string;
+  passingGrade: number; // The threshold for passing (e.g., 50, 60, or 75)
   periodRatios: {
     midterm: number;
     finals: number;
@@ -28,8 +29,9 @@ export interface GradingTemplate {
 export const GRADING_TEMPLATES: GradingTemplate[] = [
   {
     id: 'distura-calculus',
-    name: 'Differential & Integral Calculus (Distura)',
-    description: 'Sir Baks System: Quizzes (35%), Major Exam (45%), Attendance (10%), Problem Set (10%). Midterm: 30%, Finals: 70%. Base-50 passing.',
+    name: 'Calculus (Distura)',
+    description: 'Sir Baks System: Base-50 scaled. Passing: 75%.',
+    passingGrade: 75,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
       { id: 'quiz', name: 'Quizzes', weight: 0.35, score: null, maxScore: 100, formulaType: 'sir-baks', isAverage: true, subScores: [null, null], subMaxScores: [100, 100] },
@@ -40,30 +42,31 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
   },
   {
     id: 'borbon-const-materials',
-    name: 'Construction Materials and Testing (Borbon)',
-    description: 'Zero-Based: Quiz (40%), Major Exam (50%), Problem Set (10%). Midterm: 30%, Finals: 70%. Base-50 transmutation.',
+    name: 'Const Materials (Borbon)',
+    description: 'Zero-Based: Simple weighted average. Passing: 50%.',
+    passingGrade: 50,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
-      { id: 'quiz', name: 'Quizzes', weight: 0.40, score: null, maxScore: 100, formulaType: 'base-50', isAverage: true, subScores: [null], subMaxScores: [100] },
-      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'base-50' },
-      { id: 'problem-set', name: 'Problem Set', weight: 0.10, score: null, maxScore: 100, formulaType: 'base-50' },
+      { id: 'quiz', name: 'Quizzes', weight: 0.40, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null], subMaxScores: [100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'linear' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.10, score: null, maxScore: 100, formulaType: 'linear' },
     ]
   },
   {
     id: 'cabanus-deformable',
     name: 'Deformable Bodies (Cabanus)',
-    description: 'Zero-Based: Quiz (30%), Major Exam (50%), Problem Set (20%). Midterm: 30%, Finals: 70%. Base-60 transmutation.',
+    description: 'Zero-Based: Simple weighted average. Passing: 60%.',
+    passingGrade: 60,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
-      { id: 'quiz', name: 'Quizzes', weight: 0.30, score: null, maxScore: 100, formulaType: 'base-60', isAverage: true, subScores: [null], subMaxScores: [100] },
-      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'base-60' },
-      { id: 'problem-set', name: 'Problem Set', weight: 0.20, score: null, maxScore: 100, formulaType: 'base-60' },
+      { id: 'quiz', name: 'Quizzes', weight: 0.30, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null], subMaxScores: [100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'linear' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.20, score: null, maxScore: 100, formulaType: 'linear' },
     ]
   }
 ];
 
 export const calculateComponentScore = (component: GradingComponent): number => {
-  console.log(`[DEBUG] Calculating component: ${component.name} (${component.id})`);
   let percentage = 0;
 
   if (component.isAverage && component.subScores && component.subMaxScores) {
@@ -73,35 +76,23 @@ export const calculateComponentScore = (component: GradingComponent): number => 
     if (validPairs.length > 0) {
       const sums = validPairs.reduce((acc, p) => acc + (p.s! / p.m!), 0);
       percentage = sums / validPairs.length;
-      console.log(`[DEBUG] Average percentage for ${component.name}: ${(percentage * 100).toFixed(2)}% from ${validPairs.length} items`);
     }
   } else if (component.score !== null && component.maxScore !== null && component.maxScore !== 0) {
     percentage = component.score / component.maxScore;
-    console.log(`[DEBUG] Direct percentage for ${component.name}: ${(percentage * 100).toFixed(2)}%`);
   }
 
-  let result = 0;
   const weightPoints = component.weight * 100;
 
   switch (component.formulaType) {
     case 'sir-baks':
     case 'base-50':
-      // ((Raw / Max) * 0.5 + 0.5) * WeightPoints
-      result = (percentage * 0.5 + 0.5) * weightPoints;
-      break;
+      return (percentage * 0.5 + 0.5) * weightPoints;
     case 'base-60':
-      // ((Raw / Max) * 0.4 + 0.6) * WeightPoints
-      result = (percentage * 0.4 + 0.6) * weightPoints;
-      break;
+      return (percentage * 0.4 + 0.6) * weightPoints;
     case 'linear':
     default:
-      // (Raw / Max) * WeightPoints
-      result = percentage * weightPoints;
-      break;
+      return percentage * weightPoints;
   }
-
-  console.log(`[DEBUG] Component ${component.name} final points: ${result.toFixed(2)} / ${weightPoints}`);
-  return result;
 };
 
 export const getFormulaLatex = (component: GradingComponent): string => {

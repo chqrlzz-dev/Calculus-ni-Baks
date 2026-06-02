@@ -40,7 +40,7 @@ import {
   createDefaultCourse
 } from "@/utils/storage";
 import { generateImageTranscript } from "@/utils/imageExport";
-import { GradingComponent } from "@/utils/gradingSystems";
+import { GradingComponent, GRADING_TEMPLATES } from "@/utils/gradingSystems";
 
 const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((props, ref) => {
   const [courses, setCourses] = useState<CourseData[]>([]);
@@ -58,6 +58,7 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
   }));
 
   const activeCourse = courses.find(c => c.id === activeCourseId);
+  const activeTemplate = GRADING_TEMPLATES.find(t => t.id === activeCourse?.templateId) || GRADING_TEMPLATES[0];
 
   useEffect(() => {
     const init = async () => {
@@ -65,16 +66,45 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
       const savedActiveId = getActiveCourseId();
       
       if (savedCourses.length === 0) {
-        const defaultCourse = createDefaultCourse("General Calculus");
-        setCourses([defaultCourse]);
-        setActiveCourseIdState(defaultCourse.id);
-        setActiveCourseId(defaultCourse.id);
-        saveCourse(defaultCourse);
+        // Create standard set of subjects as default for convenience
+        const initialCourses = GRADING_TEMPLATES.map(t => {
+          const course = {
+            id: crypto.randomUUID(),
+            name: t.name,
+            templateId: t.id,
+            passingGrade: t.passingGrade,
+            midtermComponents: JSON.parse(JSON.stringify(t.defaultComponents)),
+            finalsComponents: JSON.parse(JSON.stringify(t.defaultComponents)),
+            settings: {
+              midtermWeight: t.periodRatios.midterm,
+              finalsWeight: t.periodRatios.finals,
+              targetGrade: 75
+            },
+            lastModified: new Date().toISOString()
+          };
+          return course;
+        });
+        setCourses(initialCourses);
+        const firstId = initialCourses[0].id;
+        setActiveCourseIdState(firstId);
+        setActiveCourseId(firstId);
+        initialCourses.forEach(saveCourse);
       } else {
         // Migration check
         const migratedCourses = savedCourses.map(course => {
-          if (!course.midtermComponents) {
-            return createDefaultCourse(course.name);
+          if (!course.midtermComponents || course.passingGrade === undefined) {
+            const template = GRADING_TEMPLATES.find(t => t.id === course.templateId) || GRADING_TEMPLATES[0];
+            return {
+              ...course,
+              passingGrade: course.passingGrade ?? template.passingGrade,
+              midtermComponents: course.midtermComponents || JSON.parse(JSON.stringify(template.defaultComponents)),
+              finalsComponents: course.finalsComponents || JSON.parse(JSON.stringify(template.defaultComponents)),
+              settings: course.settings || {
+                midtermWeight: template.periodRatios.midterm,
+                finalsWeight: template.periodRatios.finals,
+                targetGrade: 75
+              }
+            };
           }
           return course;
         });
@@ -95,14 +125,15 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
   const midtermGrade = calculateTotalPeriodGrade(activeCourse.midtermComponents);
   const finalsGrade = calculateTotalPeriodGrade(activeCourse.finalsComponents);
 
+  const passingGrade = activeCourse.passingGrade ?? activeTemplate.passingGrade;
   const finalGrade = calculateFinalGrade(
     midtermGrade, 
     finalsGrade, 
     activeCourse.settings.midtermWeight, 
     activeCourse.settings.finalsWeight
   );
-  const gpe = calculateGPE(finalGrade);
-  const gradeColor = getGradeColor(finalGrade);
+  const gpe = calculateGPE(finalGrade, passingGrade);
+  const gradeColor = getGradeColor(finalGrade, passingGrade);
 
   // Weight validation
   const midtermWeightTotal = activeCourse.midtermComponents.reduce((s, c) => s + c.weight, 0);
@@ -209,18 +240,20 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
             </div>
           </div>
           
-          <div className="hidden lg:flex items-center gap-12 flex-1 justify-center px-12">
-             <div className="flex flex-col items-center">
-               <span className="text-[8px] font-black uppercase text-muted-foreground tracking-widest">Midterm</span>
-               <span className={`font-mono text-xl font-bold ${midtermGrade < 75 ? 'text-destructive' : 'text-foreground'}`}>{midtermGrade.toFixed(1)}%</span>
-             </div>
-             <div className="flex flex-col items-center">
-               <span className="text-[8px] font-black uppercase text-muted-foreground tracking-widest">Finals</span>
-               <span className={`font-mono text-xl font-bold ${finalsGrade < 75 ? 'text-destructive' : 'text-foreground'}`}>{finalsGrade.toFixed(1)}%</span>
+          <div className="hidden lg:flex flex-col items-center gap-2 flex-1 justify-center px-12">
+             <div className="flex items-center gap-12">
+               <div className="flex flex-col items-center">
+                 <span className="text-[8px] font-black uppercase text-muted-foreground tracking-widest">Midterm</span>
+                 <span className={`font-mono text-xl font-bold ${midtermGrade < passingGrade ? 'text-destructive' : 'text-foreground'}`}>{midtermGrade.toFixed(1)}%</span>
+               </div>
+               <div className="flex flex-col items-center">
+                 <span className="text-[8px] font-black uppercase text-muted-foreground tracking-widest">Finals</span>
+                 <span className={`font-mono text-xl font-bold ${finalsGrade < passingGrade ? 'text-destructive' : 'text-foreground'}`}>{finalsGrade.toFixed(1)}%</span>
+               </div>
              </div>
              <div className="w-full max-w-xs space-y-1">
-               <Progress value={finalGrade} className="h-2 bg-primary/10" />
-               <div className="flex justify-between text-[8px] font-black uppercase opacity-40"><span>0</span><span>Academic Progress</span><span>100</span></div>
+               <Progress value={finalGrade} className="h-1.5 bg-primary/10" />
+               <div className="flex justify-between text-[7px] font-black uppercase opacity-40"><span>0</span><span>Passing Threshold: {passingGrade}%</span><span>100</span></div>
              </div>
           </div>
 
@@ -230,6 +263,33 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
           </div>
         </div>
       </header>
+
+      {/* Subject Stream Tabs */}
+      <div className="w-full bg-muted/30 border-b border-primary/5 px-4 py-2 shrink-0">
+        <ScrollArea className="w-full" orientation="horizontal">
+          <div className="flex items-center gap-2 pb-2">
+            {courses.map(course => (
+              <Button
+                key={course.id}
+                variant={activeCourseId === course.id ? "default" : "ghost"}
+                size="sm"
+                onClick={() => { setActiveCourseIdState(course.id); setActiveCourseId(course.id); }}
+                className={`rounded-full px-5 h-9 text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all ${activeCourseId === course.id ? 'shadow-lg shadow-primary/20 scale-105' : 'text-muted-foreground/60 hover:bg-primary/5'}`}
+              >
+                {course.name}
+              </Button>
+            ))}
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => setConfigOpen(true)}
+              className="rounded-full w-9 h-9 border-primary/10 bg-background/50 hover:bg-primary/5 shrink-0"
+            >
+              <Plus className="w-4 h-4 text-primary" />
+            </Button>
+          </div>
+        </ScrollArea>
+      </div>
 
       <ScrollArea className="flex-1">
         <main className="p-4 lg:p-12 pb-32">
@@ -331,6 +391,7 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
                       periodName="Midterm" 
                       components={activeCourse.midtermComponents} 
                       periodGrade={midtermGrade}
+                      passingGrade={passingGrade}
                       onComponentChange={(id, updates) => handleComponentChange('midterm', id, updates)}
                       onSubScoreChange={(id, idx, val, isMax) => handleSubScoreChange('midterm', id, idx, val, isMax)}
                       onAddSubScore={(id) => handleAddSubScore('midterm', id)}
@@ -343,6 +404,7 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
                       periodName="Finals" 
                       components={activeCourse.finalsComponents} 
                       periodGrade={finalsGrade}
+                      passingGrade={passingGrade}
                       onComponentChange={(id, updates) => handleComponentChange('finals', id, updates)}
                       onSubScoreChange={(id, idx, val, isMax) => handleSubScoreChange('finals', id, idx, val, isMax)}
                       onAddSubScore={(id) => handleAddSubScore('finals', id)}
