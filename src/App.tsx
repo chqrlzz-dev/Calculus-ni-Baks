@@ -18,13 +18,17 @@ const queryClient = new QueryClient();
 const App = () => {
   const [settingsHandler, setSettingsHandler] = useState<(() => void) | undefined>();
 
+  const handleSetSettingsHandler = React.useCallback((handler: () => void) => {
+    setSettingsHandler(() => handler);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <BrowserRouter>
           <MainLayout onSettingsClick={settingsHandler}>
             <Routes>
-              <Route path="/" element={<Index onSettingsClick={(handler) => setSettingsHandler(() => handler)} />} />
+              <Route path="/" element={<Index onSettingsClick={handleSetSettingsHandler} />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
