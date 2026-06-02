@@ -48,16 +48,20 @@ This document outlines the completely redesigned UI/UX and technical architectur
 
 ---
 
-## 📐 The Master Formula
+## 📐 The Master Formula Registry
 
-### Period-Based Weighted Total
-$$ \text{Final Grade} = (\text{Midterm} \times 0.30) + (\text{Finals} \times 0.70) $$
+The system now supports a comprehensive registry of engineering subjects, each with unique mathematical logic:
 
-### Standard 50-Point Adjustment
+### Subject Templates & Logic
+- **Calculus Series (Distura):** 50-point adjustment (Base-50). 30/70 period ratio. 75% passing.
+- **Geotechnical Engineering:** Base-60 adjustment for major exams. 40/60 period ratio. 70% passing.
+- **Physics for Engineers:** Base-50 adjustment across all components. 33/67 period ratio. 75% passing.
+- **Structural Theory:** Strict Zero-Based logic (Linear). 30/70 period ratio. 50% passing.
+- **Thermodynamics:** Base-50 adjustment. 40/60 period ratio. 75% passing.
+- **Construction Materials:** Zero-Based logic. 30/70 period ratio. 50% passing.
+
+### Standard Adjustment Formula (Base-50)
 $$ \text{Adjusted Score} = \left( \frac{\text{Raw Score}}{\text{Max Score}} \times 50 \right) + 50 $$
 
-### Weight Distribution (Default)
-- **Quizzes:** 35%
-- **Major Exam:** 45%
-- **Attendance:** 10%
-- **Problem Set:** 10%
+### Target Projection Logic
+$$ F_{req} = \frac{\text{Target} - (\text{Midterm} \times W_m)}{W_f} $$

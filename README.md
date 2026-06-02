@@ -1,113 +1,57 @@
-# Calculus ni Baks 📘✏️
+# Calculus ni Baks v1.6.0 📘✏️
 
-_A no-backend grade calculator for Civil Engineering students who know that "If it's easy, it's not CE."_
+_A next-gen, no-backend grade calculator for Civil Engineering students who know that "If it's easy, it's not CE."_
 
 ## 🧠 What is this?
 
-**Calculus ni Baks** is a frontend-only HTML + JavaScript tool that computes your grades based on your quiz scores, major exams, attendance, and problem sets — exactly how Sir Baks does it.
+**Calculus ni Baks** is a high-performance, mobile-first academic suite designed for engineering students. It handles complex grading systems (Base-50, Base-60, Zero-Based) and provides predictive analytics to help you reach your target grades.
 
 ---
 
-## 🧮 Grading Logic
+## 📐 Comprehensive Grading Registry
 
-### 📊 Components per Semester
+The system supports a wide range of engineering subjects with specialized logic:
 
-Each semester (Midterm and Finals) is broken down into:
-
-- **Quizzes (2)** – 35%
-- **Major Exam (1)** – 45%
-- **Attendance** – 10%
-- **Problem Set** – 10%
-
-> **Final Grade Composition:**
->
-> - Midterm = 30%
-> - Finals = 70%
+### 📊 Supported Subject Templates
+- **Calculus Series (Distura):** 50-point adjustment (Base-50). 30/70 period ratio. 75% passing.
+- **Geotechnical Engineering:** Base-60 adjustment for major exams. 40/60 period ratio. 70% passing.
+- **Physics for Engineers:** Base-50 adjustment across all components. 33/67 period ratio. 75% passing.
+- **Structural Theory:** Strict Zero-Based logic (Linear). 30/70 period ratio. 50% passing.
+- **Thermodynamics:** Base-50 adjustment. 40/60 period ratio. 75% passing.
+- **Construction Materials:** Zero-Based logic. 30/70 period ratio. 50% passing.
 
 ---
 
-## 🧩 Breakdown of Each Component
+## 🧩 The Mathematical Core
 
-### 1. **Quiz Formula (Per Semester)**
+### 1. **The 50-Point Adjustment (Base-50)**
+$$ \text{Result} = \left( \frac{\text{Raw}}{\text{Max}} \times 50 \right) + 50 $$
 
-```text
-Average of 2 quizzes → ( (Q1 + Q2) / 2 )
+### 2. **Period Aggregation**
+$$ \text{Final Grade} = (\text{Midterm} \times W_m) + (\text{Finals} \times W_f) $$
 
-Adjusted Grade:
-((Avg / 100) * 0.5 * 100) + 50
-
-Final Weighted:
-Adjusted Grade * 0.35
-```
-
-> You can optionally input the quiz max score (e.g., out of 95). If left blank, it defaults to 100.
-
-### 2. **Major Exam Formula**
-
-```text
-( (Raw Score / Max) * 0.5 * 100 ) + 50
-→ Multiply result by 0.45
-```
-
-### 3. **Attendance (10%)**
-
-```text
-Score out of 10 = Direct percentage (e.g., 9/10 = 9%)
-```
-
-### 4. **Problem Set (10%)**
-
-```text
-Score out of 10 = Direct percentage
-```
+### 3. **Goal Targeting (Predictive Logic)**
+$$ F_{req} = \frac{T - (M \times W_m)}{W_f} $$
 
 ---
 
-## 🧾 Final Grade Computation
+## 🧰 Modern Mobile Features
 
-```text
-Midterm Grade = Quiz + Exam + Attendance + Problem Set
-Finals Grade  = Quiz + Exam + Attendance + Problem Set
-
-Final Grade = (Midterm * 0.30) + (Finals * 0.70)
-```
-
----
-
-## 🎓 Grade Point Equivalence (GPE)
-
-```text
-Grade      | GPE
------------|-----
-99–100     | 1.00
-96–98      | 1.25
-93–95      | 1.50
-90–92      | 1.75
-87–89      | 2.00
-84–86      | 2.25
-81–83      | 2.50
-78–80      | 2.75
-75–77      | 3.00
-Below 75   | 5.00
-```
-
----
-
-## 🧰 Features
-
-- [x] Works offline
-- [x] Mobile-friendly
-- [x] Handles max score anomalies (e.g. over 95 instead of 100)
-- [x] Clear breakdown of Midterm, Finals, and Final GPE
-- [x] Filipino academic humor included 😅
+- [x] **Live Proof Engine:** Real-time LaTeX breakdown of every calculation step.
+- [x] **Predictive Analytics:** Calculate exactly what score you need to pass or hit a target.
+- [x] **Glassmorphism UI:** Modern, gamer-inspired aesthetic with dark mode optimization.
+- [x] **Zero-Server Architecture:** 100% private, all data stays on your device (LocalStorage).
+- [x] **Export Capabilities:** Save your success as a high-quality image transcript.
 
 ---
 
 ## 🏗️ Tech Stack
 
-- **HTML**
-- **Vanilla JavaScript**
-- **Pure CSS**
+- **Framework:** React 18 (TypeScript)
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS + Shadcn UI
+- **Math:** KaTeX (LaTeX Rendering)
+- **Persistence:** LocalStorage API
 
 ---
 
