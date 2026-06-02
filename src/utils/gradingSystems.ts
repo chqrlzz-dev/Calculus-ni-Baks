@@ -1,5 +1,6 @@
 
-export type GradingFormulaType = 'sir-baks' | 'linear' | 'base-50' | 'custom';
+
+export type GradingFormulaType = 'sir-baks' | 'linear' | 'base-50' | 'base-60' | 'custom';
 
 export interface GradingComponent {
   id: string;
@@ -13,20 +14,10 @@ export interface GradingComponent {
   subMaxScores?: (number | null)[];
 }
 
-export interface PeriodState {
-  components: GradingComponent[];
-}
-
 export interface GradingTemplate {
   id: string;
   name: string;
   description: string;
-  midtermWeights: {
-    [key: string]: number;
-  };
-  finalsWeights: {
-    [key: string]: number;
-  };
   periodRatios: {
     midterm: number;
     finals: number;
@@ -36,11 +27,9 @@ export interface GradingTemplate {
 
 export const GRADING_TEMPLATES: GradingTemplate[] = [
   {
-    id: 'sir-baks-calculus',
-    name: 'Differential & Integral Calculus (Sir Baks)',
-    description: 'Quizzes (35%), Major Exam (45%), Attendance (10%), Problem Set (10%). Midterm: 30%, Finals: 70%.',
-    midtermWeights: { quiz: 0.35, exam: 0.45, attendance: 0.1, problemSet: 0.1 },
-    finalsWeights: { quiz: 0.35, exam: 0.45, attendance: 0.1, problemSet: 0.1 },
+    id: 'distura-calculus',
+    name: 'Differential & Integral Calculus (Distura)',
+    description: 'Sir Baks System: Quizzes (35%), Major Exam (45%), Attendance (10%), Problem Set (10%). Midterm: 30%, Finals: 70%. Base-50 passing.',
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
       { id: 'quiz', name: 'Quizzes', weight: 0.35, score: null, maxScore: 100, formulaType: 'sir-baks', isAverage: true, subScores: [null, null], subMaxScores: [100, 100] },
@@ -50,21 +39,31 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
     ]
   },
   {
-    id: 'const-materials',
-    name: 'Construction Materials and Testing',
-    description: 'Quiz (40%), Midterm Exam (50%), Problem Set (10%). Midterm: 30%, Finals: 70%.',
-    midtermWeights: { quiz: 0.4, exam: 0.5, problemSet: 0.1 },
-    finalsWeights: { quiz: 0.4, exam: 0.5, problemSet: 0.1 },
+    id: 'borbon-const-materials',
+    name: 'Construction Materials and Testing (Borbon)',
+    description: 'Zero-Based: Quiz (40%), Major Exam (50%), Problem Set (10%). Midterm: 30%, Finals: 70%. Base-50 transmutation.',
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
-      { id: 'quiz', name: 'Quizzes', weight: 0.40, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null], subMaxScores: [100] },
-      { id: 'exam', name: 'Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'linear' },
-      { id: 'problem-set', name: 'Problem Set', weight: 0.10, score: null, maxScore: 100, formulaType: 'linear' },
+      { id: 'quiz', name: 'Quizzes', weight: 0.40, score: null, maxScore: 100, formulaType: 'base-50', isAverage: true, subScores: [null], subMaxScores: [100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'base-50' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.10, score: null, maxScore: 100, formulaType: 'base-50' },
+    ]
+  },
+  {
+    id: 'cabanus-deformable',
+    name: 'Deformable Bodies (Cabanus)',
+    description: 'Zero-Based: Quiz (30%), Major Exam (50%), Problem Set (20%). Midterm: 30%, Finals: 70%. Base-60 transmutation.',
+    periodRatios: { midterm: 0.3, finals: 0.7 },
+    defaultComponents: [
+      { id: 'quiz', name: 'Quizzes', weight: 0.30, score: null, maxScore: 100, formulaType: 'base-60', isAverage: true, subScores: [null], subMaxScores: [100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'base-60' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.20, score: null, maxScore: 100, formulaType: 'base-60' },
     ]
   }
 ];
 
 export const calculateComponentScore = (component: GradingComponent): number => {
+  console.log(`[DEBUG] Calculating component: ${component.name} (${component.id})`);
   let percentage = 0;
 
   if (component.isAverage && component.subScores && component.subMaxScores) {
@@ -74,22 +73,35 @@ export const calculateComponentScore = (component: GradingComponent): number => 
     if (validPairs.length > 0) {
       const sums = validPairs.reduce((acc, p) => acc + (p.s! / p.m!), 0);
       percentage = sums / validPairs.length;
+      console.log(`[DEBUG] Average percentage for ${component.name}: ${(percentage * 100).toFixed(2)}% from ${validPairs.length} items`);
     }
   } else if (component.score !== null && component.maxScore !== null && component.maxScore !== 0) {
     percentage = component.score / component.maxScore;
+    console.log(`[DEBUG] Direct percentage for ${component.name}: ${(percentage * 100).toFixed(2)}%`);
   }
+
+  let result = 0;
+  const weightPoints = component.weight * 100;
 
   switch (component.formulaType) {
     case 'sir-baks':
-      // ((Raw / Max) * 0.5 + 0.5) * WeightPoints
-      return (percentage * 0.5 + 0.5) * (component.weight * 100);
     case 'base-50':
-      return (percentage * 0.5 + 0.5) * (component.weight * 100);
+      // ((Raw / Max) * 0.5 + 0.5) * WeightPoints
+      result = (percentage * 0.5 + 0.5) * weightPoints;
+      break;
+    case 'base-60':
+      // ((Raw / Max) * 0.4 + 0.6) * WeightPoints
+      result = (percentage * 0.4 + 0.6) * weightPoints;
+      break;
     case 'linear':
     default:
       // (Raw / Max) * WeightPoints
-      return percentage * (component.weight * 100);
+      result = percentage * weightPoints;
+      break;
   }
+
+  console.log(`[DEBUG] Component ${component.name} final points: ${result.toFixed(2)} / ${weightPoints}`);
+  return result;
 };
 
 export const getFormulaLatex = (component: GradingComponent): string => {
@@ -116,6 +128,8 @@ export const getFormulaLatex = (component: GradingComponent): string => {
     case 'sir-baks':
     case 'base-50':
       return `\\left( \\frac{${scoreStr}}{${maxStr}} \\times 0.5 + 0.5 \\right) \\times ${weightPoints}`;
+    case 'base-60':
+      return `\\left( \\frac{${scoreStr}}{${maxStr}} \\times 0.4 + 0.6 \\right) \\times ${weightPoints}`;
     case 'linear':
     default:
       return `\\frac{${scoreStr}}{${maxStr}} \\times ${weightPoints}`;
