@@ -1,35 +1,22 @@
 // Local storage utilities for persisting grade calculator data
 
+import { GradingComponent, GRADING_TEMPLATES } from './gradingSystems';
+
 export interface CourseData {
   id: string;
   name: string;
-  midtermState: {
-    quizScores: (number | null)[];
-    quizMaxScores: (number | null)[];
-    examScore: number | null;
-    examMaxScore: number | null;
-    attendance: number | null;
-    problemSet: number | null;
-  };
-  finalsState: {
-    quizScores: (number | null)[];
-    quizMaxScores: (number | null)[];
-    examScore: number | null;
-    examMaxScore: number | null;
-    attendance: number | null;
-    problemSet: number | null;
-  };
+  templateId?: string;
+  midtermComponents: GradingComponent[];
+  finalsComponents: GradingComponent[];
   settings: {
-    quizCount: number;
-    quizWeights: number[];
-    examWeight: number;
-    attendanceWeight: number;
-    problemSetWeight: number;
     midtermWeight: number;
     finalsWeight: number;
     targetGrade: number;
   };
   lastModified: string;
+  // Legacy fields (for backward compatibility during transition if needed)
+  midtermState?: any;
+  finalsState?: any;
 }
 
 export interface AppSettings {
@@ -145,34 +132,34 @@ export const loadAppSettings = (): AppSettings => {
 };
 
 // Default course data
-export const createDefaultCourse = (name: string = 'New Course'): CourseData => {
+export const createDefaultCourse = (name: string = 'General Calculus'): CourseData => {
+  const template = GRADING_TEMPLATES[0]; // Sir Baks is default
   return {
     id: crypto.randomUUID(),
     name,
-    midtermState: {
-      quizScores: [null, null],
-      quizMaxScores: [100, 100],
-      examScore: null,
-      examMaxScore: 100,
-      attendance: 10,
-      problemSet: 10,
-    },
-    finalsState: {
-      quizScores: [null, null],
-      quizMaxScores: [100, 100],
-      examScore: null,
-      examMaxScore: 100,
-      attendance: 10,
-      problemSet: 10,
-    },
+    templateId: template.id,
+    midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
+    finalsComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
     settings: {
-      quizCount: 2,
-      quizWeights: [0.175, 0.175], // 35% total divided by 2
-      examWeight: 0.45,
-      attendanceWeight: 0.10,
-      problemSetWeight: 0.10,
-      midtermWeight: 0.30,
-      finalsWeight: 0.70,
+      midtermWeight: template.periodRatios.midterm,
+      finalsWeight: template.periodRatios.finals,
+      targetGrade: 75
+    },
+    lastModified: new Date().toISOString()
+  };
+};
+
+export const createCourseFromTemplate = (name: string, templateId: string): CourseData => {
+  const template = GRADING_TEMPLATES.find(t => t.id === templateId) || GRADING_TEMPLATES[0];
+  return {
+    id: crypto.randomUUID(),
+    name,
+    templateId: template.id,
+    midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
+    finalsComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
+    settings: {
+      midtermWeight: template.periodRatios.midterm,
+      finalsWeight: template.periodRatios.finals,
       targetGrade: 75
     },
     lastModified: new Date().toISOString()
