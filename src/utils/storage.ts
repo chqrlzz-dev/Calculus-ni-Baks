@@ -132,11 +132,12 @@ export const loadAppSettings = (): AppSettings => {
 };
 
 // Default course data
-export const createDefaultCourse = (name: string = 'General Calculus'): CourseData => {
-  const template = GRADING_TEMPLATES[0]; // Sir Baks is default
+export const createDefaultCourse = (name?: string): CourseData => {
+  const template = GRADING_TEMPLATES[0]; // Diff Cal is default
+  const courseName = name || template.name;
   return {
     id: crypto.randomUUID(),
-    name,
+    name: courseName,
     templateId: template.id,
     passingGrade: template.passingGrade,
     midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
@@ -154,7 +155,7 @@ export const createCourseFromTemplate = (name: string, templateId: string): Cour
   const template = GRADING_TEMPLATES.find(t => t.id === templateId) || GRADING_TEMPLATES[0];
   return {
     id: crypto.randomUUID(),
-    name,
+    name: name || template.name,
     templateId: template.id,
     passingGrade: template.passingGrade,
     midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),

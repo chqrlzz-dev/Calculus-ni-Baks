@@ -2,7 +2,11 @@ import { GradingComponent, calculateComponentScore } from './gradingSystems';
 
 // Calculate total period grade from dynamic components
 export const calculateTotalPeriodGrade = (components: GradingComponent[]): number => {
-  return components.reduce((sum, comp) => sum + calculateComponentScore(comp), 0);
+  if (!components || !Array.isArray(components)) {
+    console.error('[DEBUG] components is undefined or not an array', components);
+    return 0;
+  }
+  return components.reduce((sum, comp) => sum + (calculateComponentScore(comp) || 0), 0);
 };
 
 // Calculate final grade with dynamic period weighting

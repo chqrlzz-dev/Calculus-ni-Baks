@@ -77,49 +77,84 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
       const savedCourses = loadCourses();
       const savedActiveId = getActiveCourseId();
       
-      if (savedCourses.length === 0) {
-        // Create the core CE subject set by default
-        const initialCourses = GRADING_TEMPLATES.map(t => {
-          const course: CourseData = {
-            id: crypto.randomUUID(),
-            name: t.name,
-            templateId: t.id,
-            passingGrade: t.passingGrade,
-            midtermComponents: JSON.parse(JSON.stringify(t.defaultComponents)),
-            finalsComponents: JSON.parse(JSON.stringify(t.defaultComponents)),
-            settings: {
-              midtermWeight: t.periodRatios.midterm,
-              finalsWeight: t.periodRatios.finals,
-              targetGrade: 75
-            },
-            lastModified: new Date().toISOString()
-          };
-          return course;
-        });
-        setCourses(initialCourses);
-        const firstId = initialCourses[0].id;
-        setActiveCourseIdState(firstId);
-        setActiveCourseId(firstId);
-        initialCourses.forEach(saveCourse);
-      } else {
-        // Migration check for new naming and passing thresholds
-        const migratedCourses = savedCourses.map(course => {
-          const template = GRADING_TEMPLATES.find(t => t.id === course.templateId);
-          if (template && (course.passingGrade === undefined || (course.passingGrade === 75 && template.passingGrade !== 75))) {
-             return {
-               ...course,
-               passingGrade: template.passingGrade
-             };
-          }
-          return course;
-        });
-        setCourses(migratedCourses);
-        const idToSet = savedActiveId && migratedCourses.find(c => c.id === savedActiveId) 
+      let updatedCourses = [...savedCourses];
+      let needsSaving = false;
+
+      // 1. Ensure all 4 core templates are represented
+      GRADING_TEMPLATES.forEach(template => {
+        const hasCore = updatedCourses.some(c => c.templateId === template.id);
+        if (!hasCore) {
+           // Try to find a legacy course to convert before creating new
+           const legacyIndex = updatedCourses.findIndex(c => 
+             !c.templateId && (c.name.includes("Calculus") || c.name === "New Course" || c.name === "General Calculus")
+           );
+
+           if (legacyIndex !== -1 && !GRADING_TEMPLATES.some(t => t.name === updatedCourses[legacyIndex].name)) {
+              // Convert legacy to this template
+              updatedCourses[legacyIndex] = {
+                 ...updatedCourses[legacyIndex],
+                 name: template.name,
+                 templateId: template.id,
+                 passingGrade: template.passingGrade,
+                 midtermComponents: updatedCourses[legacyIndex].midtermComponents || JSON.parse(JSON.stringify(template.defaultComponents)),
+                 finalsComponents: updatedCourses[legacyIndex].finalsComponents || JSON.parse(JSON.stringify(template.defaultComponents))
+              };
+           } else {
+              // Add fresh core subject
+              const newCourse: CourseData = {
+                 id: crypto.randomUUID(),
+                 name: template.name,
+                 templateId: template.id,
+                 passingGrade: template.passingGrade,
+                 midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
+                 finalsComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
+                 settings: {
+                   midtermWeight: template.periodRatios.midterm,
+                   finalsWeight: template.periodRatios.finals,
+                   targetGrade: 75
+                 },
+                 lastModified: new Date().toISOString()
+              };
+              updatedCourses.push(newCourse);
+           }
+           needsSaving = true;
+        }
+      });
+
+      // 2. Final Sync: Ensure names and thresholds match templates exactly for core IDs
+      updatedCourses = updatedCourses.map(c => {
+         const template = GRADING_TEMPLATES.find(t => t.id === c.templateId);
+         if (template) {
+            if (c.name !== template.name || c.passingGrade !== template.passingGrade) {
+               needsSaving = true;
+               return { ...c, name: template.name, passingGrade: template.passingGrade };
+            }
+         }
+         return c;
+      });
+
+      // 3. Cleanup: Remove any remaining legacy "General Calculus" or "New Course" that isn't a core subject
+      const finalCourses = updatedCourses.filter(c => {
+         const isGeneric = c.name === "General Calculus" || c.name === "New Course";
+         const isCore = GRADING_TEMPLATES.some(t => t.id === c.templateId);
+         return !isGeneric || isCore;
+      });
+
+      if (finalCourses.length !== savedCourses.length) needsSaving = true;
+
+      if (needsSaving || savedCourses.length === 0) {
+        setCourses(finalCourses);
+        saveCourses(finalCourses);
+        const validActiveId = savedActiveId && finalCourses.find(c => c.id === savedActiveId) 
           ? savedActiveId 
-          : migratedCourses[0].id;
-        setActiveCourseIdState(idToSet);
-        setActiveCourseId(idToSet);
+          : finalCourses[0].id;
+        setActiveCourseIdState(validActiveId);
+        setActiveCourseId(validActiveId);
+      } else {
+        setCourses(finalCourses);
+        setActiveCourseIdState(savedActiveId || finalCourses[0].id);
       }
+      
       setIsLoading(false);
     };
     init();
