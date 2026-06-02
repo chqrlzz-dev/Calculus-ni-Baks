@@ -153,10 +153,10 @@ const CalculationsPage: React.FC = () => {
           <Card className="border-none bg-muted/20 rounded-[32px]">
             <CardContent className="p-8 space-y-6">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                To find the score needed in finals (<InlineMath>F_{req}</InlineMath>) for a target grade (<InlineMath>T</InlineMath>), the system solves the weighted average equation:
+                To find the score needed in finals (<InlineMath math="F_{req}" />) for a target grade (<InlineMath math="T" />), the system solves the weighted average equation:
               </p>
               <div className="bg-background/50 p-6 rounded-2xl border border-white/5">
-                <BlockMath>{`F_{req} = \\frac{T - (M \\times W_m)}{W_f}`}</BlockMath>
+                <BlockMath math="F_{req} = \frac{T - (M \times W_m)}{W_f}" />
               </div>
               <p className="text-[9px] text-center text-muted-foreground/60 italic">
                 *Results are automatically rounded to the nearest integer.
@@ -166,7 +166,7 @@ const CalculationsPage: React.FC = () => {
         </section>
 
         <footer className="text-center py-10 opacity-30">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em]">Verified Academic Registry v2.0</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em]">Verified Academic Registry v2.1-stable</p>
         </footer>
       </main>
     </div>

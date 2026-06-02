@@ -1,24 +1,30 @@
-# Calculus ni Baks v1.6.0 📘✏️
+# Calculus ni Baks v2.1.0 📘✏️
 
 _A next-gen, no-backend grade calculator for Civil Engineering students who know that "If it's easy, it's not CE."_
 
 ## 🧠 What is this?
 
-**Calculus ni Baks** is a high-performance, mobile-first academic suite designed for engineering students. It handles complex grading systems (Base-50, Base-60, Zero-Based) and provides predictive analytics to help you reach your target grades.
+**Calculus ni Baks** is a high-performance, mobile-first academic suite designed for engineering students. It handles complex Philippine engineering grading systems and provides predictive analytics.
 
 ---
 
-## 📐 Comprehensive Grading Registry
+## 📐 Streamlined Subject Registry
 
-The system supports a wide range of engineering subjects with specialized logic:
+The system supports the core engineering curriculum with specialized logic:
 
-### 📊 Supported Subject Templates
-- **Calculus Series (Distura):** 50-point adjustment (Base-50). 30/70 period ratio. 75% passing.
-- **Geotechnical Engineering:** Base-60 adjustment for major exams. 40/60 period ratio. 70% passing.
-- **Physics for Engineers:** Base-50 adjustment across all components. 33/67 period ratio. 75% passing.
-- **Structural Theory:** Strict Zero-Based logic (Linear). 30/70 period ratio. 50% passing.
-- **Thermodynamics:** Base-50 adjustment. 40/60 period ratio. 75% passing.
-- **Construction Materials:** Zero-Based logic. 30/70 period ratio. 50% passing.
+- **Calculus Series (Distura):** 50-point adjustment (Base-50).
+- **Structural Theory (Cabanus):** Strict Zero-Based logic (Linear).
+- **Construction Materials (Borbon):** Zero-Based logic.
+
+---
+
+## 🧰 Modern Mobile Features
+
+- [x] **Discord Crashlytics:** Real-time error reporting via Discord Webhooks for pro-active maintenance.
+- [x] **Instant Feedback:** Direct line to developers for feature requests and bug reports.
+- [x] **Live Proof Engine:** Real-time LaTeX breakdown of every calculation step.
+- [x] **Predictive Analytics:** Calculate exactly what score you need to pass or hit a target.
+- [x] **Zero-Server Architecture:** 100% private, all data stays on your device (LocalStorage).
 
 ---
 

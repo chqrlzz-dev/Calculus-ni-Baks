@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { sendFeedback } from "@/draeAnalytics";
 
 const FeedbackPage: React.FC = () => {
   const [feedback, setFeedback] = useState("");
@@ -28,14 +29,22 @@ const FeedbackPage: React.FC = () => {
     if (!feedback.trim()) return;
 
     setIsSubmitting(true);
-    // Simulation logic (keep original fetch logic but with simplified UX)
-    setTimeout(() => {
-      alert("Feedback received! Thank you for improving Grade Genius.");
+    try {
+      await sendFeedback(
+        `Rating: ${rating} Star(s)`,
+        feedback,
+        email
+      );
+      alert("Feedback received! Thank you for improving Calculus ni Baks.");
       setFeedback("");
       setEmail("");
       setRating(0);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send feedback. Please try again later.");
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   return (

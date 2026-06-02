@@ -48,17 +48,20 @@ This document outlines the completely redesigned UI/UX and technical architectur
 
 ---
 
+### 🚀 Discord-Powered Ecosystem
+- **Instant Feedback:** All user reports and star ratings are transmitted via Discord Webhooks for real-time developer review.
+- **Global Crashlytics:** Unhandled runtime errors and promise rejections are automatically logged to a secure Discord channel for proactive debugging.
+
+---
+
 ## 📐 The Master Formula Registry
 
-The system now supports a comprehensive registry of engineering subjects, each with unique mathematical logic:
+The system streamlines core engineering subjects with specialized mathematical logic:
 
 ### Subject Templates & Logic
 - **Calculus Series (Distura):** 50-point adjustment (Base-50). 30/70 period ratio. 75% passing.
-- **Geotechnical Engineering:** Base-60 adjustment for major exams. 40/60 period ratio. 70% passing.
-- **Physics for Engineers:** Base-50 adjustment across all components. 33/67 period ratio. 75% passing.
-- **Structural Theory:** Strict Zero-Based logic (Linear). 30/70 period ratio. 50% passing.
-- **Thermodynamics:** Base-50 adjustment. 40/60 period ratio. 75% passing.
-- **Construction Materials:** Zero-Based logic. 30/70 period ratio. 50% passing.
+- **Structural Theory (Cabanus):** Strict Zero-Based logic (Linear). 30/70 period ratio. 60% passing.
+- **Construction Materials (Borbon):** Zero-Based logic. 30/70 period ratio. 50% passing.
 
 ### Standard Adjustment Formula (Base-50)
 $$ \text{Adjusted Score} = \left( \frac{\text{Raw Score}}{\text{Max Score}} \times 50 \right) + 50 $$

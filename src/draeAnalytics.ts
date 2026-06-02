@@ -75,21 +75,51 @@ async function generateVisitorHash(): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
 }
 
+export async function sendError(message: string, source: string, stack?: string): Promise<void> {
+  const label = getOrCreateLabel();
+  await sendToDiscord({
+    embeds: [{
+      title: '❌ Runtime Crash',
+      description: `**${label}** crashed!`,
+      color: CONFIG.COLORS.ERROR,
+      timestamp: new Date().toISOString(),
+      fields: [
+        { name: 'Message', value: message },
+        { name: 'Source', value: source },
+        { name: 'Stack', value: stack ? stack.substring(0, 1000) : 'N/A' }
+      ]
+    }]
+  });
+}
+
+export async function sendFeedback(type: string, content: string, contact?: string): Promise<void> {
+  const label = getOrCreateLabel();
+  await sendToDiscord({
+    embeds: [{
+      title: '💬 New Feedback',
+      description: `**${label}** sent some feedback.`,
+      color: CONFIG.COLORS.SESSION_START,
+      timestamp: new Date().toISOString(),
+      fields: [
+        { name: 'Type', value: type, inline: true },
+        { name: 'Contact', value: contact || 'Anonymous', inline: true },
+        { name: 'Content', value: content }
+      ]
+    }]
+  });
+}
+
 function setupCrashlytics(): void {
   window.addEventListener('error', async (event) => {
-    const label = getOrCreateLabel();
-    await sendToDiscord({
-      embeds: [{
-        title: '❌ Runtime Crash',
-        description: `**${label}** crashed!`,
-        color: CONFIG.COLORS.ERROR,
-        timestamp: new Date().toISOString(),
-        fields: [
-          { name: 'Message', value: event.message },
-          { name: 'Source', value: `${event.filename}:${event.lineno}` }
-        ]
-      }]
-    });
+    await sendError(event.message, `${event.filename}:${event.lineno}`, event.error?.stack);
+  });
+
+  window.addEventListener('unhandledrejection', async (event) => {
+    await sendError(
+      `Promise Rejection: ${event.reason?.message || event.reason}`, 
+      'Unhandled Rejection', 
+      event.reason?.stack
+    );
   });
 }
 

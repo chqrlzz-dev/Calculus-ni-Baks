@@ -30,7 +30,7 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
   {
     id: 'diff-cal-distura',
     name: 'Diff Cal',
-    description: 'Differential Calculus (Distura): Sir Baks System. Features a 50-point adjustment (Base-50). Passing: 75%. Midterm: 30%, Finals: 70%.',
+    description: 'Differential Calculus (Distura): Sir Baks System. Passing: 75%.',
     passingGrade: 75,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
@@ -43,7 +43,7 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
   {
     id: 'integral-cal-distura',
     name: 'Integral Cal',
-    description: 'Integral Calculus (Distura): Sir Baks System. Features a 50-point adjustment (Base-50). Passing: 75%. Midterm: 30%, Finals: 70%.',
+    description: 'Integral Calculus (Distura): Sir Baks System. Passing: 75%.',
     passingGrade: 75,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
@@ -54,46 +54,9 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
     ]
   },
   {
-    id: 'geotech-1',
-    name: 'Geotech 1',
-    description: 'Geotechnical Engineering: Soil Mechanics. Features Base-60 Adjustment for Exams and Zero-Based for Quizzes. Passing: 70%. Midterm: 40%, Finals: 60%.',
-    passingGrade: 70,
-    periodRatios: { midterm: 0.4, finals: 0.6 },
-    defaultComponents: [
-      { id: 'exam', name: 'Major Exam', weight: 0.40, score: null, maxScore: 100, formulaType: 'base-60' },
-      { id: 'quiz', name: 'Quizzes', weight: 0.30, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null, null, null], subMaxScores: [100, 100, 100] },
-      { id: 'lab', name: 'Laboratory', weight: 0.20, score: null, maxScore: 100, formulaType: 'linear' },
-      { id: 'seatwork', name: 'Seatwork/Plate', weight: 0.10, score: null, maxScore: 100, formulaType: 'linear' },
-    ]
-  },
-  {
-    id: 'physics-engineers',
-    name: 'Physics',
-    description: 'Physics for Engineers: Calculus-Based. Features Base-50 for all major components. Passing: 75%. Midterm: 33%, Finals: 67%.',
-    passingGrade: 75,
-    periodRatios: { midterm: 0.33, finals: 0.67 },
-    defaultComponents: [
-      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'base-50' },
-      { id: 'quiz', name: 'Long Quizzes', weight: 0.30, score: null, maxScore: 100, formulaType: 'base-50', isAverage: true, subScores: [null, null], subMaxScores: [100, 100] },
-      { id: 'problem-set', name: 'Problem Sets', weight: 0.20, score: null, maxScore: 100, formulaType: 'linear' },
-    ]
-  },
-  {
-    id: 'struct-theory',
-    name: 'Struct Theory',
-    description: 'Structural Theory I: Determinant Structures. Zero-Based Strict. Passing: 50%. Midterm: 30%, Finals: 70%.',
-    passingGrade: 50,
-    periodRatios: { midterm: 0.3, finals: 0.7 },
-    defaultComponents: [
-      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'linear' },
-      { id: 'quiz', name: 'Quizzes', weight: 0.40, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null, null, null], subMaxScores: [100, 100, 100] },
-      { id: 'plate', name: 'Structural Plates', weight: 0.10, score: null, maxScore: 100, formulaType: 'linear' },
-    ]
-  },
-  {
     id: 'cmat-borbon',
     name: 'CMAT',
-    description: 'Const Materials (Borbon): Zero-Based. Passing: 50%. Midterm: 30%, Finals: 70%.',
+    description: 'Const Materials (Borbon): Zero-Based. Passing: 50%.',
     passingGrade: 50,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
@@ -105,25 +68,13 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
   {
     id: 'strema-cabanus',
     name: 'Strema',
-    description: 'Mechanics of Deformable Bodies (Cabanus): Zero-Based. Passing: 60%. Midterm: 30%, Finals: 70%.',
+    description: 'Mechanics of Deformable Bodies (Cabanus): Zero-Based. Passing: 60%.',
     passingGrade: 60,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
       { id: 'quiz', name: 'Quizzes', weight: 0.30, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null], subMaxScores: [100] },
       { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'linear' },
       { id: 'problem-set', name: 'Problem Set', weight: 0.20, score: null, maxScore: 100, formulaType: 'linear' },
-    ]
-  },
-  {
-    id: 'thermo-1',
-    name: 'Thermo 1',
-    description: 'Thermodynamics I: Engineering Principles. Base-50 System. Passing: 75%. Midterm: 40%, Finals: 60%.',
-    passingGrade: 75,
-    periodRatios: { midterm: 0.4, finals: 0.6 },
-    defaultComponents: [
-      { id: 'exam', name: 'Major Exam', weight: 0.45, score: null, maxScore: 100, formulaType: 'base-50' },
-      { id: 'quiz', name: 'Quizzes', weight: 0.35, score: null, maxScore: 100, formulaType: 'base-50', isAverage: true, subScores: [null, null], subMaxScores: [100, 100] },
-      { id: 'seatwork', name: 'Problem Sets', weight: 0.20, score: null, maxScore: 100, formulaType: 'linear' },
     ]
   }
 ];
