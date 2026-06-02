@@ -28,9 +28,9 @@ export interface GradingTemplate {
 
 export const GRADING_TEMPLATES: GradingTemplate[] = [
   {
-    id: 'distura-calculus',
-    name: 'Calculus (Distura)',
-    description: 'Sir Baks System: Base-50 scaled. Passing: 75%.',
+    id: 'diff-cal-distura',
+    name: 'Diff Cal',
+    description: 'Differential Calculus (Distura): Sir Baks System. Passing: 75%.',
     passingGrade: 75,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
@@ -41,9 +41,22 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
     ]
   },
   {
-    id: 'borbon-const-materials',
-    name: 'Const Materials (Borbon)',
-    description: 'Zero-Based: Simple weighted average. Passing: 50%.',
+    id: 'integral-cal-distura',
+    name: 'Integral Cal',
+    description: 'Integral Calculus (Distura): Sir Baks System. Passing: 75%.',
+    passingGrade: 75,
+    periodRatios: { midterm: 0.3, finals: 0.7 },
+    defaultComponents: [
+      { id: 'quiz', name: 'Quizzes', weight: 0.35, score: null, maxScore: 100, formulaType: 'sir-baks', isAverage: true, subScores: [null, null], subMaxScores: [100, 100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.45, score: null, maxScore: 100, formulaType: 'sir-baks' },
+      { id: 'attendance', name: 'Attendance', weight: 0.10, score: 10, maxScore: 10, formulaType: 'linear' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.10, score: 10, maxScore: 10, formulaType: 'linear' },
+    ]
+  },
+  {
+    id: 'cmat-borbon',
+    name: 'CMAT',
+    description: 'Const Materials (Borbon): Zero-Based. Passing: 50%.',
     passingGrade: 50,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [
@@ -53,9 +66,9 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
     ]
   },
   {
-    id: 'cabanus-deformable',
-    name: 'Deformable Bodies (Cabanus)',
-    description: 'Zero-Based: Simple weighted average. Passing: 60%.',
+    id: 'strema-cabanus',
+    name: 'Strema',
+    description: 'Mechanics of Deformable Bodies (Cabanus): Zero-Based. Passing: 60%.',
     passingGrade: 60,
     periodRatios: { midterm: 0.3, finals: 0.7 },
     defaultComponents: [

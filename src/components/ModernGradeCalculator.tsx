@@ -21,6 +21,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
 import GradingPeriod from "./GradingPeriod";
 import CourseSelector from "./CourseSelector";
 import CalculationPreview from "./CalculationPreview";
@@ -37,7 +48,8 @@ import {
   saveCourse, 
   getActiveCourseId, 
   setActiveCourseId,
-  createDefaultCourse
+  createDefaultCourse,
+  createCourseFromTemplate
 } from "@/utils/storage";
 import { generateImageTranscript } from "@/utils/imageExport";
 import { GradingComponent, GRADING_TEMPLATES } from "@/utils/gradingSystems";
@@ -66,9 +78,9 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
       const savedActiveId = getActiveCourseId();
       
       if (savedCourses.length === 0) {
-        // Create standard set of subjects as default for convenience
+        // Create the core CE subject set by default
         const initialCourses = GRADING_TEMPLATES.map(t => {
-          const course = {
+          const course: CourseData = {
             id: crypto.randomUUID(),
             name: t.name,
             templateId: t.id,
@@ -90,21 +102,14 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
         setActiveCourseId(firstId);
         initialCourses.forEach(saveCourse);
       } else {
-        // Migration check
+        // Migration check for new naming and passing thresholds
         const migratedCourses = savedCourses.map(course => {
-          if (!course.midtermComponents || course.passingGrade === undefined) {
-            const template = GRADING_TEMPLATES.find(t => t.id === course.templateId) || GRADING_TEMPLATES[0];
-            return {
-              ...course,
-              passingGrade: course.passingGrade ?? template.passingGrade,
-              midtermComponents: course.midtermComponents || JSON.parse(JSON.stringify(template.defaultComponents)),
-              finalsComponents: course.finalsComponents || JSON.parse(JSON.stringify(template.defaultComponents)),
-              settings: course.settings || {
-                midtermWeight: template.periodRatios.midterm,
-                finalsWeight: template.periodRatios.finals,
-                targetGrade: 75
-              }
-            };
+          const template = GRADING_TEMPLATES.find(t => t.id === course.templateId);
+          if (template && (course.passingGrade === undefined || (course.passingGrade === 75 && template.passingGrade !== 75))) {
+             return {
+               ...course,
+               passingGrade: template.passingGrade
+             };
           }
           return course;
         });
@@ -227,8 +232,37 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
     }
   };
 
+  const handleHardReset = () => {
+    const initialCourses = GRADING_TEMPLATES.map(t => {
+      const course: CourseData = {
+        id: crypto.randomUUID(),
+        name: t.name,
+        templateId: t.id,
+        passingGrade: t.passingGrade,
+        midtermComponents: JSON.parse(JSON.stringify(t.defaultComponents)),
+        finalsComponents: JSON.parse(JSON.stringify(t.defaultComponents)),
+        settings: {
+          midtermWeight: t.periodRatios.midterm,
+          finalsWeight: t.periodRatios.finals,
+          targetGrade: 75
+        },
+        lastModified: new Date().toISOString()
+      };
+      return course;
+    });
+    
+    setCourses(initialCourses);
+    setActiveCourseIdState(initialCourses[0].id);
+    setActiveCourseId(initialCourses[0].id);
+    
+    localStorage.removeItem('grade-calculator-courses'); 
+    initialCourses.forEach(saveCourse);
+    
+    setConfigOpen(false);
+  };
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-background">
+    <div className="flex flex-col h-screen overflow-hidden bg-background selection:bg-primary/20">
       {/* Sticky Header Status */}
       <header className="w-full bg-background/60 backdrop-blur-xl border-b border-primary/10 p-4 shrink-0 shadow-sm">
         <div className="max-w-md mx-auto flex items-center justify-between lg:max-w-none">
@@ -370,7 +404,23 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
                           </Card>
                         </div>
                         
-                        <Button variant="outline" className="w-full h-16 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 border-primary/10 hover:bg-destructive/10 hover:text-destructive transition-colors"><History className="w-4 h-4" /> Reset Course Logic</Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" className="w-full h-16 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 border-primary/10 hover:bg-destructive/10 hover:text-destructive transition-colors"><History className="w-4 h-4" /> Reset Course Logic</Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="rounded-[2rem] border-destructive/10">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="font-black text-destructive">Wipe All Data?</AlertDialogTitle>
+                              <AlertDialogDescription className="font-medium text-muted-foreground/80">
+                                This will delete ALL your current scores and restore the default subject registry (Diff Cal, Integral Cal, CMAT, and Strema). This cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="rounded-xl text-[10px] font-black uppercase tracking-widest border-none hover:bg-muted shadow-none">Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={handleHardReset} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-black uppercase tracking-widest text-[10px] px-6 shadow-sm shadow-destructive/20 transition-all active:scale-95">Reset Registry</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </ScrollArea>
                   </DrawerContent>
