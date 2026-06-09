@@ -120,8 +120,7 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
       // 3. Cleanup: Remove any subjects that are not in the core registry unless they were custom created
       const finalCourses = updatedCourses.filter(c => {
          const isCore = GRADING_TEMPLATES.some(t => t.id === c.templateId);
-         // Keep custom subjects, but for this update we want to align with user request
-         return isCore || (c.name !== "Diff Cal" && c.name !== "Integral Cal" && c.name !== "CMAT" && c.name !== "Strema");
+         return isCore || !["Diff Cal", "Integral Cal", "CMAT", "Strema", "Theory"].includes(c.name);
       });
 
       if (finalCourses.length !== updatedCourses.length) needsSaving = true;
@@ -431,7 +430,7 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
                             <AlertDialogHeader>
                               <AlertDialogTitle className="font-black text-destructive">Wipe All Data?</AlertDialogTitle>
                               <AlertDialogDescription className="font-medium text-muted-foreground/80">
-                                This will delete ALL your current scores and restore the default subject registry (Theory). This cannot be undone.
+                                This will delete ALL your current scores and restore the default subject registry (Diff Cal, Integral Cal, CMAT, Strema, and Theory). This cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

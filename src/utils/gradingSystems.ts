@@ -1,5 +1,4 @@
 
-
 export type GradingFormulaType = 'sir-baks' | 'linear' | 'base-50' | 'base-60' | 'zero-based';
 
 export interface GradingComponent {
@@ -27,6 +26,56 @@ export interface GradingTemplate {
 }
 
 export const GRADING_TEMPLATES: GradingTemplate[] = [
+  {
+    id: 'diff-cal-distura',
+    name: 'Diff Cal',
+    description: 'Differential Calculus (Distura): Sir Baks System. Passing: 75%.',
+    passingGrade: 75,
+    periodRatios: { midterm: 0.3, finals: 0.7 },
+    defaultComponents: [
+      { id: 'quiz', name: 'Quizzes', weight: 0.35, score: null, maxScore: 100, formulaType: 'sir-baks', isAverage: true, subScores: [null, null], subMaxScores: [100, 100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.45, score: null, maxScore: 100, formulaType: 'sir-baks' },
+      { id: 'attendance', name: 'Attendance', weight: 0.10, score: 10, maxScore: 10, formulaType: 'linear' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.10, score: 10, maxScore: 10, formulaType: 'linear' },
+    ]
+  },
+  {
+    id: 'integral-cal-distura',
+    name: 'Integral Cal',
+    description: 'Integral Calculus (Distura): Sir Baks System. Passing: 75%.',
+    passingGrade: 75,
+    periodRatios: { midterm: 0.3, finals: 0.7 },
+    defaultComponents: [
+      { id: 'quiz', name: 'Quizzes', weight: 0.35, score: null, maxScore: 100, formulaType: 'sir-baks', isAverage: true, subScores: [null, null], subMaxScores: [100, 100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.45, score: null, maxScore: 100, formulaType: 'sir-baks' },
+      { id: 'attendance', name: 'Attendance', weight: 0.10, score: 10, maxScore: 10, formulaType: 'linear' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.10, score: 10, maxScore: 10, formulaType: 'linear' },
+    ]
+  },
+  {
+    id: 'cmat-borbon',
+    name: 'CMAT',
+    description: 'Const Materials (Borbon): Zero-Based. Passing: 50%.',
+    passingGrade: 50,
+    periodRatios: { midterm: 0.3, finals: 0.7 },
+    defaultComponents: [
+      { id: 'quiz', name: 'Quizzes', weight: 0.40, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null], subMaxScores: [100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'linear' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.10, score: null, maxScore: 100, formulaType: 'linear' },
+    ]
+  },
+  {
+    id: 'strema-cabanus',
+    name: 'Strema',
+    description: 'Mechanics of Deformable Bodies (Cabanus): Zero-Based. Passing: 60%.',
+    passingGrade: 60,
+    periodRatios: { midterm: 0.3, finals: 0.7 },
+    defaultComponents: [
+      { id: 'quiz', name: 'Quizzes', weight: 0.30, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null], subMaxScores: [100] },
+      { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'linear' },
+      { id: 'problem-set', name: 'Problem Set', weight: 0.20, score: null, maxScore: 100, formulaType: 'linear' },
+    ]
+  },
   {
     id: 'theory-zero-based',
     name: 'Theory',
