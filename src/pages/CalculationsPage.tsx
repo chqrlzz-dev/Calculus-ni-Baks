@@ -47,13 +47,13 @@ const CalculationsPage: React.FC = () => {
               <CardContent className="p-8 space-y-6">
                 <div className="flex items-center gap-2">
                   <Info className="w-4 h-4 text-blue-400" />
-                  <h3 className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Standard 50-Point Base</h3>
+                  <h3 className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Theory Zero-Based Logic</h3>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Used by most Engineering instructors. It translates a raw score of 0% to 50% and 100% to 100%. This provides a safety net for students in highly technical subjects.
+                  Used by Theory of Structures and other advanced engineering subjects. It uses a direct linear scale where your raw percentage corresponds directly to your grade points.
                 </p>
                 <div className="bg-background/50 p-6 rounded-2xl border border-white/5">
-                  <BlockMath>{`\\text{Result} = \\left( \\frac{\\text{Raw}}{\\text{Max}} \\times 50 \\right) + 50`}</BlockMath>
+                  <BlockMath>{`\\text{Result} = \\frac{\\text{Raw}}{\\text{Max}} \\times \\text{Weight}`}</BlockMath>
                 </div>
               </CardContent>
             </Card>
@@ -165,8 +165,11 @@ const CalculationsPage: React.FC = () => {
           </Card>
         </section>
 
-        <footer className="text-center py-10 opacity-30">
+        <footer className="text-center py-10 opacity-30 space-y-4">
           <p className="text-[10px] font-black uppercase tracking-[0.3em]">Verified Academic Registry v2.1-stable</p>
+          <p className="text-[8px] font-medium leading-relaxed max-w-[200px] mx-auto">
+            *This calculator may or may not be 100% accurate as professors have different types of curving grades.
+          </p>
         </footer>
       </main>
     </div>
