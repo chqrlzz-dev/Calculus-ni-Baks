@@ -75,18 +75,6 @@ export const GRADING_TEMPLATES: GradingTemplate[] = [
       { id: 'exam', name: 'Major Exam', weight: 0.50, score: null, maxScore: 100, formulaType: 'linear' },
       { id: 'problem-set', name: 'Problem Set', weight: 0.20, score: null, maxScore: 100, formulaType: 'linear' },
     ]
-  },
-  {
-    id: 'theory-zero-based',
-    name: 'Theory',
-    description: 'Structural Theory: Zero-Based. Passing: 50%.',
-    passingGrade: 50,
-    periodRatios: { midterm: 0.5, finals: 0.5 },
-    defaultComponents: [
-      { id: 'quiz', name: 'Quizzes', weight: 0.40, score: null, maxScore: 100, formulaType: 'linear', isAverage: true, subScores: [null], subMaxScores: [100] },
-      { id: 'exam', name: 'Major Exam', weight: 0.40, score: null, maxScore: 100, formulaType: 'linear' },
-      { id: 'problem-set', name: 'Problem Set', weight: 0.20, score: null, maxScore: 100, formulaType: 'linear' },
-    ]
   }
 ];
 
