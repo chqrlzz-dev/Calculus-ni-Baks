@@ -166,7 +166,7 @@ const CalculationsPage: React.FC = () => {
         </section>
 
         <footer className="text-center py-10 opacity-30 space-y-4">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em]">Verified Academic Registry v2.1-stable</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em]">Verified Academic Registry v2.1.1-stable</p>
           <p className="text-[8px] font-medium leading-relaxed max-w-[200px] mx-auto">
             *This calculator may or may not be 100% accurate as professors have different types of curving grades.
           </p>
