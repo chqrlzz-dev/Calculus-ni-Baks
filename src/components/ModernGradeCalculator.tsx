@@ -81,43 +81,26 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
       let updatedCourses = [...savedCourses];
       let needsSaving = false;
 
-      // 1. Ensure all 4 core templates are represented
+      // 1. Ensure Theory core template is represented
       GRADING_TEMPLATES.forEach(template => {
         const hasCore = updatedCourses.some(c => c.templateId === template.id);
         if (!hasCore) {
-           // Try to find a legacy course to convert before creating new
-           const legacyIndex = updatedCourses.findIndex(c => 
-             !c.templateId && (c.name.includes("Calculus") || c.name === "New Course" || c.name === "General Calculus")
-           );
-
-           if (legacyIndex !== -1 && !GRADING_TEMPLATES.some(t => t.name === updatedCourses[legacyIndex].name)) {
-              // Convert legacy to this template
-              updatedCourses[legacyIndex] = {
-                 ...updatedCourses[legacyIndex],
-                 name: template.name,
-                 templateId: template.id,
-                 passingGrade: template.passingGrade,
-                 midtermComponents: updatedCourses[legacyIndex].midtermComponents || JSON.parse(JSON.stringify(template.defaultComponents)),
-                 finalsComponents: updatedCourses[legacyIndex].finalsComponents || JSON.parse(JSON.stringify(template.defaultComponents))
-              };
-           } else {
-              // Add fresh core subject
-              const newCourse: CourseData = {
-                 id: crypto.randomUUID(),
-                 name: template.name,
-                 templateId: template.id,
-                 passingGrade: template.passingGrade,
-                 midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
-                 finalsComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
-                 settings: {
-                   midtermWeight: template.periodRatios.midterm,
-                   finalsWeight: template.periodRatios.finals,
-                   targetGrade: 75
-                 },
-                 lastModified: new Date().toISOString()
-              };
-              updatedCourses.push(newCourse);
-           }
+           // Add fresh core subject
+           const newCourse: CourseData = {
+              id: crypto.randomUUID(),
+              name: template.name,
+              templateId: template.id,
+              passingGrade: template.passingGrade,
+              midtermComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
+              finalsComponents: JSON.parse(JSON.stringify(template.defaultComponents)),
+              settings: {
+                midtermWeight: template.periodRatios.midterm,
+                finalsWeight: template.periodRatios.finals,
+                targetGrade: 75
+              },
+              lastModified: new Date().toISOString()
+           };
+           updatedCourses.push(newCourse);
            needsSaving = true;
         }
       });
@@ -134,14 +117,14 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
          return c;
       });
 
-      // 3. Cleanup: Remove any remaining legacy "General Calculus" or "New Course" that isn't a core subject
+      // 3. Cleanup: Remove any subjects that are not in the core registry unless they were custom created
       const finalCourses = updatedCourses.filter(c => {
-         const isGeneric = c.name === "General Calculus" || c.name === "New Course";
          const isCore = GRADING_TEMPLATES.some(t => t.id === c.templateId);
-         return !isGeneric || isCore;
+         // Keep custom subjects, but for this update we want to align with user request
+         return isCore || (c.name !== "Diff Cal" && c.name !== "Integral Cal" && c.name !== "CMAT" && c.name !== "Strema");
       });
 
-      if (finalCourses.length !== savedCourses.length) needsSaving = true;
+      if (finalCourses.length !== updatedCourses.length) needsSaving = true;
 
       if (needsSaving || savedCourses.length === 0) {
         setCourses(finalCourses);
@@ -448,7 +431,7 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
                             <AlertDialogHeader>
                               <AlertDialogTitle className="font-black text-destructive">Wipe All Data?</AlertDialogTitle>
                               <AlertDialogDescription className="font-medium text-muted-foreground/80">
-                                This will delete ALL your current scores and restore the default subject registry (Diff Cal, Integral Cal, CMAT, and Strema). This cannot be undone.
+                                This will delete ALL your current scores and restore the default subject registry (Theory). This cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -463,6 +446,15 @@ const ModernGradeCalculator = forwardRef<{ scrollToSettings: () => void }, {}>((
                 </Drawer>
               </div>
             </div>
+
+            {/* Accuracy Disclaimer */}
+            <Alert className="rounded-2xl border-primary/20 bg-primary/5 border-dashed">
+              <AlertCircle className="h-4 w-4 text-primary" />
+              <AlertTitle className="font-black text-[10px] uppercase tracking-widest text-primary">Accuracy Disclaimer</AlertTitle>
+              <AlertDescription className="text-[10px] font-medium opacity-70 leading-relaxed">
+                This calculator may or may not be 100% accurate as professors have different types of curving grades and rounding policies. Use this as a general guide only.
+              </AlertDescription>
+            </Alert>
 
             <Tabs value={periodTab} onValueChange={setPeriodTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1 rounded-2xl h-16 border border-primary/10 lg:max-w-sm shadow-inner">
